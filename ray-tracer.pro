@@ -7,7 +7,9 @@ TARGET  = ray-tracer
 CONFIG *= qt opengl release
 CONFIG += c++11
 # config de Qt
-QT     *= opengl xml
+QT *= opengl xml
+QT += widgets
+QT += openglwidgets 
 QMAKE_CXXFLAGS += -std=c++11
 
 # Noms de vos fichiers entete
@@ -24,13 +26,13 @@ SOURCES = Viewer.cpp ray-tracer.cpp Sphere.cpp
 
 # Exemple de configuration Linux Ubuntu 16.04, Qt5 et libQGLViewer
 #INCLUDEPATH *= /usr/include
-LIBS *= -L/usr/lib/x86_64-linux-gnu -lQGLViewer
+#LIBS *= -L/usr/lib/x86_64-linux-gnu -lQGLViewer
 
 # Exemple de configuration MacOSX avec macports
 ## INCLUDEPATH *= /opt/local/include
 ## LIBS *= -L/opt/local/lib -lQGLViewer 
 
 # Exemple de configuration MacOSX avec frameworks
-##  INCLUDEPATH *= /Users/login/libQGLViewer-2.6.4
-##  LIBS *= -F/Users/login/Library/Frameworks -framework QGLViewer
+INCLUDEPATH *= /Users/huseyinyurtseven/Downloads/libQGLViewer-2.9.1
+LIBS *= -F/Users/huseyinyurtseven/Downloads/libQGLViewer-2.9.1/QGLViewer -framework QGLViewer
 
