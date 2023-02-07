@@ -91,12 +91,40 @@ rt::Real
 rt::Sphere::rayIntersection(const Ray &ray, Point3 &p)
 {
   // TO DO
-  double distance = sqrt(pow(ray.origin.x - center.x, 2) + pow(ray.origin.y - center.y, 2) + pow(ray.origin.z - center.z, 2));
+  Vector3 OP = this->center - ray.origin;
+  Vector3 w = ray.direction / ray.direction.norm();
 
-  if (distance > pow(radius, 2))
+  Real distanceOH = w.dot(OP);
+  Real distanceHPCarre = OP.dot(OP) - (distanceOH * distanceOH);
+
+  if (distanceHPCarre > (this->radius * this->radius))
+  {
     return 1.0f;
+  }
+  else
+  {
+    Real b = sqrt(this->radius * this->radius - distanceHPCarre);
+    Real t1 = (distanceOH - b);
+    Real t2 = (distanceOH + b);
 
-  double t = v
-
-  return -1.0f;
+    if (t1 < 0 && t2 < 0)
+      return 1.0f;
+    else if (t1 > 0 && t2 > 0)
+    {
+      p = ray.origin + std::min(t1, t2) * w;
+      return -1.0f;
+    }
+    else
+    {
+      if (t1 < 0)
+      {
+        p = ray.origin + t2 * w;
+      }
+      else
+      {
+        p = ray.origin + t1 * w;
+      }
+      return -1.0f;
+    }
+  }
 }
