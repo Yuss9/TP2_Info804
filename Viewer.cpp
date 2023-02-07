@@ -12,31 +12,28 @@
 using namespace std;
 
 // Draws a tetrahedron with 4 colors.
-void 
-rt::Viewer::draw()
+void rt::Viewer::draw()
 {
   // Set up lights
-  if ( ptrScene != 0 )
-    ptrScene->light( *this );
+  if (ptrScene != 0)
+    ptrScene->light(*this);
   // Draw all objects
-  if ( ptrScene != 0 )
-    ptrScene->draw( *this );
+  if (ptrScene != 0)
+    ptrScene->draw(*this);
 }
 
-
-void 
-rt::Viewer::init()
+void rt::Viewer::init()
 {
   // Restore previous viewer state.
   restoreStateFromFile();
 
   // Add custom key description (see keyPressEvent).
   setKeyDescription(Qt::Key_R, "Renders the scene with a ray-tracer (low resolution)");
-  setKeyDescription(Qt::SHIFT+Qt::Key_R, "Renders the scene with a ray-tracer (medium resolution)");
-  setKeyDescription(Qt::CTRL+Qt::Key_R, "Renders the scene with a ray-tracer (high resolution)");
+  setKeyDescription(Qt::SHIFT + Qt::Key_R, "Renders the scene with a ray-tracer (medium resolution)");
+  setKeyDescription(Qt::CTRL + Qt::Key_R, "Renders the scene with a ray-tracer (high resolution)");
   setKeyDescription(Qt::Key_D, "Augments the max depth of ray-tracing algorithm");
-  setKeyDescription(Qt::SHIFT+Qt::Key_D, "Decreases the max depth of ray-tracing algorithm");
-  
+  setKeyDescription(Qt::SHIFT + Qt::Key_D, "Decreases the max depth of ray-tracing algorithm");
+
   // Opens help window
   help();
 
@@ -44,59 +41,72 @@ rt::Viewer::init()
   setMouseTracking(true);
 
   // Inits the scene
-  if ( ptrScene != 0 )
-    ptrScene->init( *this );
-  
-  // Gives a bounding box to the camera
-  camera()->setSceneBoundingBox( qglviewer::Vec( -12, -12, -2 ),qglviewer::Vec( 12, 12, 22 ) );
+  if (ptrScene != 0)
+    ptrScene->init(*this);
 
+  // Gives a bounding box to the camera
+  camera()->setSceneBoundingBox(qglviewer::Vec(-12, -12, -2), qglviewer::Vec(12, 12, 22));
 }
 
-void
-rt::Viewer::keyPressEvent(QKeyEvent *e)
+void rt::Viewer::keyPressEvent(QKeyEvent *e)
 {
   // Get event modifiers key
   const Qt::KeyboardModifiers modifiers = e->modifiers();
   bool handled = false;
-  if ((e->key()==Qt::Key_R) && ptrScene != 0 )
+  if ((e->key() == Qt::Key_R) && ptrScene != 0)
+  {
+    int w = camera()->screenWidth();
+    int h = camera()->screenHeight();
+    Renderer renderer(*ptrScene);
+    qglviewer::Vec orig, dir;
+    camera()->convertClickToLine(QPoint(0, 0), orig, dir);
+    Vector3 origin(orig);
+    Vector3 dirUL(dir);
+    camera()->convertClickToLine(QPoint(w, 0), orig, dir);
+    Vector3 dirUR(dir);
+    camera()->convertClickToLine(QPoint(0, h), orig, dir);
+    Vector3 dirLL(dir);
+    camera()->convertClickToLine(QPoint(w, h), orig, dir);
+    Vector3 dirLR(dir);
+    renderer.setViewBox(origin, dirUL, dirUR, dirLL, dirLR);
+    if (modifiers == Qt::ShiftModifier)
     {
-      int w = camera()->screenWidth();
-      int h = camera()->screenHeight();
-      Renderer renderer( *ptrScene );
-      qglviewer::Vec orig, dir;
-      camera()->convertClickToLine( QPoint( 0,0 ), orig, dir );
-      Vector3 origin( orig );
-      Vector3 dirUL( dir );
-      camera()->convertClickToLine( QPoint( w,0 ), orig, dir );
-      Vector3 dirUR( dir );
-      camera()->convertClickToLine( QPoint( 0, h ), orig, dir );
-      Vector3 dirLL( dir );
-      camera()->convertClickToLine( QPoint( w, h ), orig, dir );
-      Vector3 dirLR( dir );
-      renderer.setViewBox( origin, dirUL, dirUR, dirLL, dirLR );
-      if ( modifiers == Qt::ShiftModifier ) { w /= 2; h /= 2; }
-      else if ( modifiers == Qt::NoModifier ) { w /= 8; h /= 8; }
-      Image2D<Color> image( w, h );
-      renderer.setResolution( image.w(), image.h() );
-     renderer.render( image, maxDepth );
-      ofstream output( "output.ppm" );
-      Image2DWriter<Color>::write( image, output, true );
-      output.close();
+      w /= 2;
+      h /= 2;
+    }
+    else if (modifiers == Qt::NoModifier)
+    {
+      w /= 8;
+      h /= 8;
+    }
+    Image2D<Color> image(w, h);
+    renderer.setResolution(image.w(), image.h());
+    renderer.render(image, maxDepth);
+    ofstream output("output.ppm");
+    Image2DWriter<Color>::write(image, output, true);
+    output.close();
+    handled = true;
+  }
+  if (e->key() == Qt::Key_D)
+  {
+    if (modifiers == Qt::ShiftModifier)
+    {
+      maxDepth = std::max(1, maxDepth - 1);
       handled = true;
     }
-  if (e->key()==Qt::Key_D)
+    if (modifiers == Qt::NoModifier)
     {
-      if ( modifiers == Qt::ShiftModifier )
-        { maxDepth = std::max( 1, maxDepth - 1 ); handled = true; }
-      if ( modifiers == Qt::NoModifier )
-        { maxDepth = std::min( 20, maxDepth + 1 ); handled = true; }
-      std::cout << "Max depth is " << maxDepth << std::endl; 
+      maxDepth = std::min(20, maxDepth + 1);
+      handled = true;
     }
-    
-  if (!handled) QGLViewer::keyPressEvent(e);
+    std::cout << "Max depth is " << maxDepth << std::endl;
+  }
+
+  if (!handled)
+    QGLViewer::keyPressEvent(e);
 }
 
-QString 
+QString
 rt::Viewer::helpString() const
 {
   QString text("<h2>S i m p l e V i e w e r</h2>");
