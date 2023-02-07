@@ -1,22 +1,22 @@
 <!DOCTYPE QGLVIEWER>
 <QGLViewer version="2.9.1">
   <State stereo="false">
-    <foregroundColor blue="180" red="180" green="180"/>
-    <backgroundColor blue="51" red="51" green="51"/>
+    <foregroundColor green="180" blue="180" red="180"/>
+    <backgroundColor green="51" blue="51" red="51"/>
   </State>
-  <Display cameraIsEdited="false" axisIsDrawn="true" FPSIsDisplayed="false" gridIsDrawn="false"/>
-  <Geometry fullScreen="false" height="400" posY="167" posX="400" width="600"/>
+  <Display gridIsDrawn="false" FPSIsDisplayed="false" axisIsDrawn="true" cameraIsEdited="false"/>
+  <Geometry height="400" posY="167" posX="400" width="600" fullScreen="false"/>
   <Camera>
-    <Parameters Type="PERSPECTIVE" orthoCoef="0.146529" zClippingCoefficient="1.73205" zNearCoefficient="0.005" fieldOfView="0.785398" sceneRadius="20.7846">
-      <SceneCenter y="0" z="10" x="0"/>
+    <Parameters zClippingCoefficient="1.73205" zNearCoefficient="0.005" orthoCoef="0.0183368" Type="PERSPECTIVE" fieldOfView="0.785398" sceneRadius="20.7846">
+      <SceneCenter z="10" x="0" y="0"/>
     </Parameters>
-    <Stereo focusDistance="50.1785" physScreenWidth="0.5" IODist="0.062"/>
+    <Stereo physScreenWidth="0.5" focusDistance="50.1785" IODist="0.062"/>
     <ManipulatedCameraFrame>
-      <position y="-4.8334" z="47.043" x="-4.1442"/>
-      <orientation q3="0.807401" q1="0.0408045" q0="0.103048" q2="-0.5795"/>
-      <ManipulatedParameters rotSens="1" spinSens="0.3" transSens="1" zoomSens="1" wheelSens="1"/>
+      <position z="-15.6246" x="-17.35" y="-21.3325"/>
+      <orientation q1="-0.64985" q2="0.0763145" q3="0.436189" q0="0.617746"/>
+      <ManipulatedParameters rotSens="1" transSens="1" spinSens="0.3" zoomSens="1" wheelSens="1"/>
       <ManipulatedCameraParameters flySpeed="0.207846" rotatesAroundUpVector="false" zoomsOnPivotPoint="false">
-        <sceneUpVector y="1" z="0" x="0"/>
+        <sceneUpVector z="0" x="0" y="1"/>
       </ManipulatedCameraParameters>
     </ManipulatedCameraFrame>
   </Camera>
