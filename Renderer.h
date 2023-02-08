@@ -9,7 +9,6 @@
 #include "Color.h"
 #include "Image2D.h"
 #include "Ray.h"
-
 /// Namespace RayTracer
 namespace rt
 {
@@ -135,7 +134,45 @@ namespace rt
 
       Color final = obj_i->getMaterial(p_i).ambient + obj_i->getMaterial(p_i).diffuse;
 
-      return Color(final.r(), final.g(), final.b());
+      //return Color(final.r(), final.g(), final.b());
+      return illumination(ray, obj_i, p_i);
+    }
+
+    Color illumination(const Ray &ray, GraphicalObject *obj, Point3 p)
+    {
+      // Le principe sera le suivant:
+
+      // on récupère le matériau m de l'objet courant
+      // la couleur résultante sera C
+      // Pour chaque source de lumière l
+      // On récupère sa direction L
+      // On calcule le coefficient de diffusion kd comme le cosinus de l'angle entre L et la normale N au point p (d = 0.0 si négatif), i.e. kd←L⃗ ⋅N⃗ .
+      // On ajoute à C la couleur produit entre la couleur de la lumière B, la couleur diffuse du matériau D et son coefficient de diffusion kd.
+      // C←C+kdD∗B
+      // On ajoute à C la couleur ambiente et on retourne le résultat.
+
+      // On récupère le matériau m de l'objet courant
+      Material m = obj->getMaterial(p);
+      // la couleur résultante sera C
+      Color C = m.ambient + m.diffuse;
+      // Pour chaque source de lumière i
+      // tableau de sources de lumière
+      for (std::vector<Light *>::const_iterator it = this->ptrScene->myLights.begin(), itE = this->ptrScene->myLights.end(); it != itE; it++)
+      {
+        Vector3 L = (*it)->direction(p);
+
+        // Kd coefficient de diffusion
+        // Le produit scalaire est un nombre qui mesure l 'angle entre deux vecteurs, et donc la quantité de lumière qui est réfléchie par l' objet en position 'p' dans la direction de la lumière 'L'.Le résultat final de la division est normalisé pour éviter les fluctuations dans l 'intensité de la lumière en fonction de la distance entre l' objet et la source de lumière.
+        // .norm()) = longueur vecteur
+        Real kd = obj->getNormal(p).dot(L) / (L.norm() * obj->getNormal(p).norm());
+        if (kd < 0.0)
+          kd = 0.0;
+        Color B = (*it)->color(p);
+        Color D = m.diffuse;
+        C += kd * D * B;
+      }
+      C += m.ambient;
+      return C;
     }
   };
 
