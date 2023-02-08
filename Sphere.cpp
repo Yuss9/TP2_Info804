@@ -95,19 +95,21 @@ Il calcule la distance entre le point d'origine du rayon et le cercle, puis util
 rt::Real
 rt::Sphere::rayIntersection(const Ray &ray, Point3 &p)
 {
-  // TO DO
   Vector3 OP = this->center - ray.origin;
   Vector3 w = ray.direction / ray.direction.norm();
 
+  /// longueur entre ray.origin et le projeté de p sur ray
   Real distanceOH = w.dot(OP);
   Real distanceHPCarre = OP.dot(OP) - (distanceOH * distanceOH);
 
+  /// Pythagore
   if (distanceHPCarre > (this->radius * this->radius))
   {
     return 1.0f;
   }
   else
   {
+    // b
     Real b = sqrt(this->radius * this->radius - distanceHPCarre);
     Real t1 = (distanceOH - b);
     Real t2 = (distanceOH + b);

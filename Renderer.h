@@ -128,13 +128,14 @@ namespace rt
       GraphicalObject *obj_i = 0; // pointer to intersected object
       Point3 p_i;                 // point of intersection
 
-      // Look for intersection in this direction.
       Real ri = ptrScene->rayIntersection(ray, obj_i, p_i);
       // Nothing was intersected
-      // if ( ri >= 0.0f ) return Color( 0.0, 0.0, 0.0 ); // some background color
       if (ri >= 0.0f)
-        return result; // some background color
-      return Color(1.0, 1.0, 1.0);
+        return Color(0.0, 0.0, 0.0); // some background color
+
+      Color final = obj_i->getMaterial(p_i).ambient + obj_i->getMaterial(p_i).diffuse;
+
+      return Color(final.r(), final.g(), final.b());
     }
   };
 
