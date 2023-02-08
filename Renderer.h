@@ -13,6 +13,42 @@
 namespace rt
 {
 
+  struct Background
+  {
+    virtual Color backgroundColor(const Ray &ray) = 0;
+  };
+  struct MyBackground : public Background
+  {
+    Color backgroundColor(const Ray &ray)
+    {
+      Color result;
+      float z = ray.direction.at(2);
+      if (z >= 0.0f && z <= 0.5f)
+      {
+        return Color(1 - 2 * z, 1 - 2 * z, 1);
+      }
+      if (z > 0.5f && z <= 1.0f)
+      {
+        return Color(0, 0, 1.0f - (z - 0.5f) * 2);
+      }
+      else
+      {
+
+        Real x = -0.5f * ray.direction[0] / ray.direction[2];
+        Real y = -0.5f * ray.direction[1] / ray.direction[2];
+        Real d = sqrt(x * x + y * y);
+        Real t = std::min(d, 30.0f) / 30.0f;
+        x -= floor(x);
+        y -= floor(y);
+        if (((x >= 0.5f) && (y >= 0.5f)) || ((x < 0.5f) && (y < 0.5f)))
+          result += (1.0f - t) * Color(0.2f, 0.2f, 0.2f) + t * Color(1.0f, 1.0f, 1.0f);
+        else
+          result += (1.0f - t) * Color(0.4f, 0.4f, 0.4f) + t * Color(1.0f, 1.0f, 1.0f);
+        return result;
+      }
+    }
+  };
+
   inline void progressBar(std::ostream &output,
                           const double currentValue, const double maximumValue)
   {
@@ -69,12 +105,15 @@ namespace rt
     /// (myOrigin, myOrigin+myDirLR) forms a ray going through the lower-right
     /// corner pixel of the viewport, i.e. pixel (width,height)
     Vector3 myDirLR;
+    Background *ptrBackground;
 
     int myWidth;
     int myHeight;
-
     Renderer() : ptrScene(0) {}
-    Renderer(Scene &scene) : ptrScene(&scene) {}
+    Renderer(Scene &scene) : ptrScene(&scene)
+    {
+      ptrBackground = new MyBackground();
+    }
     void setScene(rt::Scene &aScene) { ptrScene = &aScene; }
 
     void setViewBox(Point3 origin,
@@ -130,7 +169,7 @@ namespace rt
       Real ri = ptrScene->rayIntersection(ray, obj_i, p_i);
       // Nothing was intersected
       if (ri >= 0.0f)
-        return Color(0.0, 0.0, 0.0); // some background color
+        return this->background(ray); // some background color
 
       Color final = obj_i->getMaterial(p_i).ambient + obj_i->getMaterial(p_i).diffuse;
 
@@ -179,7 +218,7 @@ namespace rt
         // Le produit scalaire est un nombre qui mesure l 'angle entre deux vecteurs, et donc la quantité de lumière qui est réfléchie par l' objet en position 'p' dans la direction de la lumière 'L'.Le résultat final de la division est normalisé pour éviter les fluctuations dans l 'intensité de la lumière en fonction de la distance entre l' objet et la source de lumière.
         // .norm()) = longueur vecteur
 
-
+        // demander au prof l'explication des formules et du cosinus
         Real kd = obj->getNormal(p).dot(L) / (L.norm() * obj->getNormal(p).norm());
         Vector3 w = reflect(ray.direction, obj->getNormal(p));
         Real cosB = w.dot(L) / (L.norm() * w.norm());
@@ -199,6 +238,24 @@ namespace rt
       }
       C += m.ambient;
       return C;
+    }
+
+    Color background(const Ray &ray)
+    {
+      Color result = Color(0.2, 0.2, 0.2);
+      for (Light *light : ptrScene->myLights)
+      {
+        Real cos_a = light->direction(ray.origin).dot(ray.direction);
+        if (cos_a > 0.99f)
+        {
+          Real a = acos(cos_a) * 360.0 / M_PI / 8.0;
+          a = std::max(1.0f - a, 0.0f);
+          result += light->color(ray.origin) * a * a;
+        }
+      }
+      if (ptrBackground != 0)
+        result += ptrBackground->backgroundColor(ray);
+      return result;
     }
   };
 
