@@ -103,7 +103,7 @@ namespace rt
             distanceMin = distance;
             p = pOther;
             object = *(it);
-          }
+          } 
         };
       }
       return -distanceMin;

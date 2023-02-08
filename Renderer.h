@@ -134,8 +134,22 @@ namespace rt
 
       Color final = obj_i->getMaterial(p_i).ambient + obj_i->getMaterial(p_i).diffuse;
 
-      //return Color(final.r(), final.g(), final.b());
+      // return Color(final.r(), final.g(), final.b());
       return illumination(ray, obj_i, p_i);
+    }
+
+    /**
+     * @brief Le vecteur réfléchi peut être calculé en utilisant la formule suivante : R = W - 2(W.N)N, où W est le vecteur incident, N est la normale à la surface et R est le vecteur réfléchi.
+     *
+     * Cette formule calcule le vecteur réfléchi en soustrayant deux fois la projection de W sur N à partir de W. La projection est calculée en multipliant le produit scalaire de W et N par N, qui est un vecteur normalisé. Cela garantit que le vecteur réfléchi aura la même direction et la même longueur que le vecteur incident.
+     *
+     * @param W
+     * @param N
+     * @return Vector3
+     */
+    Vector3 reflect(const Vector3 &W, Vector3 N) const
+    {
+      return W - 2 * W.dot(N) * N;
     }
 
     Color illumination(const Ray &ray, GraphicalObject *obj, Point3 p)
@@ -164,11 +178,23 @@ namespace rt
         // Kd coefficient de diffusion
         // Le produit scalaire est un nombre qui mesure l 'angle entre deux vecteurs, et donc la quantité de lumière qui est réfléchie par l' objet en position 'p' dans la direction de la lumière 'L'.Le résultat final de la division est normalisé pour éviter les fluctuations dans l 'intensité de la lumière en fonction de la distance entre l' objet et la source de lumière.
         // .norm()) = longueur vecteur
+
+
         Real kd = obj->getNormal(p).dot(L) / (L.norm() * obj->getNormal(p).norm());
+        Vector3 w = reflect(ray.direction, obj->getNormal(p));
+        Real cosB = w.dot(L) / (L.norm() * w.norm());
+
+        if (cosB < 0.0)
+          cosB = 0.0;
+
+        Real coefficientSpecularite = std::pow(cosB, m.shinyness);
+
         if (kd < 0.0)
           kd = 0.0;
+
         Color B = (*it)->color(p);
         Color D = m.diffuse;
+        C += kd * m.specular * coefficientSpecularite;
         C += kd * D * B;
       }
       C += m.ambient;
