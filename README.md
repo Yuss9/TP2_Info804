@@ -30,5 +30,5 @@ Sujet : https://www.lama.univ-savoie.fr/pagesmembres/lachaud/Cours/INFO805/Tests
   ./executables/viewerQ2 bunny258.tri bunnyCompressed.tri 20 20 20
 ``` -->
 
-Toutes les questions ont été abordées.
+Toutes les questions seront été abordées.
 
