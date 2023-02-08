@@ -4,20 +4,10 @@
 
 Sujet : https://www.lama.univ-savoie.fr/pagesmembres/lachaud/Cours/INFO805/Tests/html/ig_tp2.html
 
-<!-- ## Screenshots
+## Screenshots
 
-Affichage du tref.tri :
-
-![App Screenshot](imagesREADME/Tref.png)
-
-Affichage du bunny avant la compression :
-
-![App Screenshot](imagesREADME/BunnyBeforeZip.png)
-
-Affichage du bunny après la compression, avec 50 x 50 x 50 :
-
-![App Screenshot](imagesREADME/BunnyAfterZip.png)
- -->
+![App Screenshot](imagesREADME/3.3.png)
+ 
 
 ## Authors
 
