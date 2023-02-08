@@ -9,7 +9,7 @@ Sujet : https://www.lama.univ-savoie.fr/pagesmembres/lachaud/Cours/INFO805/Tests
 ![App Screenshot](imagesREADME/3.3.png)
  
  
-![App Screenshot](imagesREADME/3.5.png)
+![App Screenshot](imagesREADME/3.6.png)
  
 
 ## Authors
