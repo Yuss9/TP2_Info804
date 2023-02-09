@@ -180,8 +180,8 @@ namespace rt
 
       if (ray.depth > 0 && m.coef_reflexion != 0)
       {
-        Vector3 ReflectionRayon = reflect(ray.direction, obj_i->getNormal(p_i));
-        Ray newRay = Ray(p_i + ReflectionRayon * 0.001f, ReflectionRayon, ray.depth - 1);
+        Vector3 reflected_vector = reflect(ray.direction, obj_i->getNormal(p_i));
+        Ray newRay = Ray(p_i + reflected_vector * 0.001f, reflected_vector, ray.depth - 1);
         Color c_refl = trace(newRay);
         result += c_refl * m.specular * m.coef_reflexion;
       }
@@ -204,40 +204,76 @@ namespace rt
       return W - 2 * W.dot(N) * N;
     }
 
+    // Color illumination(const Ray &ray, GraphicalObject *obj, Point3 p)
+    // {
+    //   // Le principe sera le suivant:
+
+    //   // on récupère le matériau m de l'objet courant
+    //   // la couleur résultante sera C
+    //   // Pour chaque source de lumière l
+    //   // On récupère sa direction L
+    //   // On calcule le coefficient de diffusion kd comme le cosinus de l'angle entre L et la normale N au point p (d = 0.0 si négatif), i.e. kd←L⃗ ⋅N⃗ .
+    //   // On ajoute à C la couleur produit entre la couleur de la lumière B, la couleur diffuse du matériau D et son coefficient de diffusion kd.
+    //   // C←C+kdD∗B
+    //   // On ajoute à C la couleur ambiente et on retourne le résultat.
+
+    //   // On récupère le matériau m de l'objet courant
+    //   Material m = obj->getMaterial(p);
+    //   // la couleur résultante sera C
+    //   Color C = m.ambient + m.diffuse;
+    //   // Pour chaque source de lumière i
+    //   // tableau de sources de lumière
+    //   for (std::vector<Light *>::const_iterator it = this->ptrScene->myLights.begin(), itE = this->ptrScene->myLights.end(); it != itE; it++)
+    //   {
+    //     Vector3 L = (*it)->direction(p);
+
+    //     // Kd coefficient de diffusion
+    //     // Le produit scalaire est un nombre qui mesure l 'angle entre deux vecteurs, et donc la quantité de lumière qui est réfléchie par l' objet en position 'p' dans la direction de la lumière 'L'.Le résultat final de la division est normalisé pour éviter les fluctuations dans l 'intensité de la lumière en fonction de la distance entre l' objet et la source de lumière.
+    //     // .norm()) = longueur vecteur
+
+    //     // demander au prof l'explication des formules et du cosinus
+    //     Real kd = obj->getNormal(p).dot(L) / (L.norm() * obj->getNormal(p).norm());
+    //     Vector3 w = reflect(ray.direction, obj->getNormal(p));
+    //     Real cosB = w.dot(L) / (L.norm() * w.norm());
+    //     Color colorLight = (*it)->color(p);
+    //     Ray pointLight = Ray(p, L);
+    //     Color shadow = this->shadow(pointLight, colorLight);
+
+    //     if (cosB < 0.0)
+    //       cosB = 0.0;
+
+    //     Real coefficientSpecularite = std::pow(cosB, m.shinyness);
+
+    //     if (kd < 0.0)
+    //       kd = 0.0;
+
+    //     Color B = (*it)->color(p);
+    //     Color D = m.diffuse * m.coef_diffusion;
+    //     C += kd * m.specular * coefficientSpecularite;
+    //     // C += kd * D * B;
+    //     C += B * D * kd * shadow;
+    //   }
+    //   C += m.ambient;
+    //   return C;
+    // }
+
     Color illumination(const Ray &ray, GraphicalObject *obj, Point3 p)
     {
-      // Le principe sera le suivant:
-
-      // on récupère le matériau m de l'objet courant
-      // la couleur résultante sera C
-      // Pour chaque source de lumière l
-      // On récupère sa direction L
-      // On calcule le coefficient de diffusion kd comme le cosinus de l'angle entre L et la normale N au point p (d = 0.0 si négatif), i.e. kd←L⃗ ⋅N⃗ .
-      // On ajoute à C la couleur produit entre la couleur de la lumière B, la couleur diffuse du matériau D et son coefficient de diffusion kd.
-      // C←C+kdD∗B
-      // On ajoute à C la couleur ambiente et on retourne le résultat.
-
-      // On récupère le matériau m de l'objet courant
       Material m = obj->getMaterial(p);
-      // la couleur résultante sera C
-      Color C = m.ambient + m.diffuse;
-      // Pour chaque source de lumière i
-      // tableau de sources de lumière
+
+      Color C;
+
       for (std::vector<Light *>::const_iterator it = this->ptrScene->myLights.begin(), itE = this->ptrScene->myLights.end(); it != itE; it++)
       {
         Vector3 L = (*it)->direction(p);
 
-        // Kd coefficient de diffusion
-        // Le produit scalaire est un nombre qui mesure l 'angle entre deux vecteurs, et donc la quantité de lumière qui est réfléchie par l' objet en position 'p' dans la direction de la lumière 'L'.Le résultat final de la division est normalisé pour éviter les fluctuations dans l 'intensité de la lumière en fonction de la distance entre l' objet et la source de lumière.
-        // .norm()) = longueur vecteur
-
-        // demander au prof l'explication des formules et du cosinus
         Real kd = obj->getNormal(p).dot(L) / (L.norm() * obj->getNormal(p).norm());
         Vector3 w = reflect(ray.direction, obj->getNormal(p));
         Real cosB = w.dot(L) / (L.norm() * w.norm());
+
         Color colorLight = (*it)->color(p);
         Ray pointLight = Ray(p, L);
-        Color shadow = this->shadow(pointLight, colorLight);
+        Color shado = shadow(pointLight, colorLight);
 
         if (cosB < 0.0)
           cosB = 0.0;
@@ -250,8 +286,7 @@ namespace rt
         Color B = (*it)->color(p);
         Color D = m.diffuse;
         C += kd * m.specular * coefficientSpecularite;
-        // C += kd * D * B;
-        C += B * D * kd * shadow;
+        C += B * D * kd * shado;
       }
       C += m.ambient;
       return C;
