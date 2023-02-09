@@ -257,6 +257,15 @@ namespace rt
         result += ptrBackground->backgroundColor(ray);
       return result;
     }
+
+    /// Calcule la couleur de la lumière (donnée par light_color) dans la
+    /// direction donnée par le rayon. Si aucun objet n'est traversé,
+    /// retourne light_color, sinon si un des objets traversés est opaque,
+    /// retourne du noir, et enfin si les objets traversés sont
+    /// transparents, attenue la couleur.
+    Color shadow(const Ray &ray, Color light_color){
+      
+    }
   };
 
 } // namespace rt
