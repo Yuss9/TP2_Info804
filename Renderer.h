@@ -171,10 +171,23 @@ namespace rt
       if (ri >= 0.0f)
         return this->background(ray); // some background color
 
-      Color final = obj_i->getMaterial(p_i).ambient + obj_i->getMaterial(p_i).diffuse;
+      // Color C = obj_i->getMaterial(p_i).ambient + obj_i->getMaterial(p_i).diffuse;
 
-      // return Color(final.r(), final.g(), final.b());
-      return illumination(ray, obj_i, p_i);
+      // return Color(C.r(), C.g(), C.b());
+      // return illumination(ray, obj_i, p_i);
+
+      Material m = obj_i->getMaterial(p_i);
+
+      if (ray.depth > 0 && m.coef_reflexion != 0)
+      {
+        Vector3 ReflectionRayon = reflect(ray.direction, obj_i->getNormal(p_i));
+        Ray newRay = Ray(p_i + ReflectionRayon * 0.001f, ReflectionRayon, ray.depth - 1);
+        Color c_refl = trace(newRay);
+        result += c_refl * m.specular * m.coef_reflexion;
+      }
+
+      result += illumination(ray, obj_i, p_i);
+      return result;
     }
 
     /**
