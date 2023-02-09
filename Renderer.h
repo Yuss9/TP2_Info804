@@ -165,19 +165,14 @@ namespace rt
       Color result = Color(0.0, 0.0, 0.0);
       GraphicalObject *obj_i = 0; // pointer to intersected object
       Point3 p_i;                 // point of intersection
-
       Real ri = ptrScene->rayIntersection(ray, obj_i, p_i);
       // Nothing was intersected
       if (ri >= 0.0f)
         return this->background(ray); // some background color
-
       // Color C = obj_i->getMaterial(p_i).ambient + obj_i->getMaterial(p_i).diffuse;
-
       // return Color(C.r(), C.g(), C.b());
       // return illumination(ray, obj_i, p_i);
-
       Material m = obj_i->getMaterial(p_i);
-
       if (ray.depth > 0 && m.coef_reflexion != 0)
       {
         Vector3 reflected_vector = reflect(ray.direction, obj_i->getNormal(p_i));
@@ -185,7 +180,16 @@ namespace rt
         Color c_refl = trace(newRay);
         result += c_refl * m.specular * m.coef_reflexion;
       }
-
+      if (ray.depth > 0 && m.coef_refraction > 0)
+      {
+        Ray refractedRay = refractionRay(ray, p_i, obj_i->getNormal(p_i), m);
+        Color c_refr = trace(refractedRay);
+        result += c_refr * m.diffuse * m.coef_refraction;
+      }
+      if (ray.depth > 0)
+      {
+        result += illumination(ray, obj_i, p_i) * m.coef_diffusion;
+      }
       result += illumination(ray, obj_i, p_i);
       return result;
     }
@@ -203,59 +207,6 @@ namespace rt
     {
       return W - 2 * W.dot(N) * N;
     }
-
-    // Color illumination(const Ray &ray, GraphicalObject *obj, Point3 p)
-    // {
-    //   // Le principe sera le suivant:
-
-    //   // on récupère le matériau m de l'objet courant
-    //   // la couleur résultante sera C
-    //   // Pour chaque source de lumière l
-    //   // On récupère sa direction L
-    //   // On calcule le coefficient de diffusion kd comme le cosinus de l'angle entre L et la normale N au point p (d = 0.0 si négatif), i.e. kd←L⃗ ⋅N⃗ .
-    //   // On ajoute à C la couleur produit entre la couleur de la lumière B, la couleur diffuse du matériau D et son coefficient de diffusion kd.
-    //   // C←C+kdD∗B
-    //   // On ajoute à C la couleur ambiente et on retourne le résultat.
-
-    //   // On récupère le matériau m de l'objet courant
-    //   Material m = obj->getMaterial(p);
-    //   // la couleur résultante sera C
-    //   Color C = m.ambient + m.diffuse;
-    //   // Pour chaque source de lumière i
-    //   // tableau de sources de lumière
-    //   for (std::vector<Light *>::const_iterator it = this->ptrScene->myLights.begin(), itE = this->ptrScene->myLights.end(); it != itE; it++)
-    //   {
-    //     Vector3 L = (*it)->direction(p);
-
-    //     // Kd coefficient de diffusion
-    //     // Le produit scalaire est un nombre qui mesure l 'angle entre deux vecteurs, et donc la quantité de lumière qui est réfléchie par l' objet en position 'p' dans la direction de la lumière 'L'.Le résultat final de la division est normalisé pour éviter les fluctuations dans l 'intensité de la lumière en fonction de la distance entre l' objet et la source de lumière.
-    //     // .norm()) = longueur vecteur
-
-    //     // demander au prof l'explication des formules et du cosinus
-    //     Real kd = obj->getNormal(p).dot(L) / (L.norm() * obj->getNormal(p).norm());
-    //     Vector3 w = reflect(ray.direction, obj->getNormal(p));
-    //     Real cosB = w.dot(L) / (L.norm() * w.norm());
-    //     Color colorLight = (*it)->color(p);
-    //     Ray pointLight = Ray(p, L);
-    //     Color shadow = this->shadow(pointLight, colorLight);
-
-    //     if (cosB < 0.0)
-    //       cosB = 0.0;
-
-    //     Real coefficientSpecularite = std::pow(cosB, m.shinyness);
-
-    //     if (kd < 0.0)
-    //       kd = 0.0;
-
-    //     Color B = (*it)->color(p);
-    //     Color D = m.diffuse * m.coef_diffusion;
-    //     C += kd * m.specular * coefficientSpecularite;
-    //     // C += kd * D * B;
-    //     C += B * D * kd * shadow;
-    //   }
-    //   C += m.ambient;
-    //   return C;
-    // }
 
     Color illumination(const Ray &ray, GraphicalObject *obj, Point3 p)
     {
@@ -286,7 +237,7 @@ namespace rt
         Color B = (*it)->color(p);
         Color D = m.diffuse;
         C += kd * m.specular * coefficientSpecularite;
-        C += B * D * kd * shado;
+        C +=  D * kd * shado;
       }
       C += m.ambient;
       return C;
@@ -335,8 +286,28 @@ namespace rt
       }
       return light_color;
     }
-  };
 
+    Ray refractionRay(const Ray &aRay, const Point3 &p, Vector3 N, const Material &m)
+    {
+      Point3 newPoint = aRay.origin + aRay.direction * 0.001f;
+      Real r;
+      if (aRay.direction.dot(N) > 0)
+      {
+        r = m.in_refractive_index / m.out_refractive_index;
+      }
+      else
+      {
+        r = m.out_refractive_index / m.in_refractive_index;
+        N[0] = N[0] * -1;
+        N[1] = N[1] * -1;
+        N[2] = N[2] * -1;
+      }
+      Real c = -N.dot(aRay.direction);
+      Real calcul = 1 - r * r * (1 - c * c);
+      Vector3 refractedVector = r * aRay.direction + (r * c - std::sqrt(std::max(0.0f, calcul))) * N;
+      return Ray(newPoint, refractedVector.dot(refractedVector), aRay.depth - 1);
+    }
+  };
 } // namespace rt
 
 #endif // #define _RENDERER_H_
