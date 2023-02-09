@@ -79,7 +79,6 @@ namespace rt
       myLights.push_back(aLight);
     }
 
-    /// returns the closest object intersected by the given ray.
     Real
     rayIntersection(const Ray &ray,
                     GraphicalObject *&object, Point3 &p)
@@ -87,7 +86,8 @@ namespace rt
       Real distanceMin = -1.0f;
       Point3 pOther;
       for (std::vector<GraphicalObject *>::iterator it = this->myObjects.begin(), itE = this->myObjects.end(); it != itE; it++)
-      {
+      { 
+        // < 0 means that the ray intersects the object
         if ((*it)->rayIntersection(ray, pOther) < 0)
         {
 

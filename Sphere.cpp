@@ -114,20 +114,20 @@ rt::Sphere::rayIntersection(const Ray &ray, Point3 &p)
     Real t1 = (distanceOH - b);
     Real t2 = (distanceOH + b);
 
-    if (t1 < 0 && t2 < 0)
+    if (t1 < 0 && t2 < 0) // no intersection
       return 1.0f;
-    else if (t1 > 0 && t2 > 0)
+    else if (t1 > 0 && t2 > 0) // 2 intersections
     {
       p = ray.origin + std::min(t1, t2) * w;
       return -1.0f;
     }
     else
     {
-      if (t1 < 0)
+      if (t1 < 0) // 1 intersection
       {
         p = ray.origin + t2 * w;
       }
-      else
+      else // 1 intersection
       {
         p = ray.origin + t1 * w;
       }

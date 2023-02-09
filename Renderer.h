@@ -222,6 +222,9 @@ namespace rt
         Real kd = obj->getNormal(p).dot(L) / (L.norm() * obj->getNormal(p).norm());
         Vector3 w = reflect(ray.direction, obj->getNormal(p));
         Real cosB = w.dot(L) / (L.norm() * w.norm());
+        Color colorLight = (*it)->color(p);
+        Ray pointLight = Ray(p, L);
+        Color shadow = this->shadow(pointLight, colorLight);
 
         if (cosB < 0.0)
           cosB = 0.0;
@@ -234,7 +237,8 @@ namespace rt
         Color B = (*it)->color(p);
         Color D = m.diffuse;
         C += kd * m.specular * coefficientSpecularite;
-        C += kd * D * B;
+        // C += kd * D * B;
+        C += B * D * kd * shadow;
       }
       C += m.ambient;
       return C;
@@ -263,8 +267,25 @@ namespace rt
     /// retourne light_color, sinon si un des objets traversés est opaque,
     /// retourne du noir, et enfin si les objets traversés sont
     /// transparents, attenue la couleur.
-    Color shadow(const Ray &ray, Color light_color){
-      
+    Color shadow(const Ray &ray, Color light_color)
+    {
+      GraphicalObject *obj_i = 0;
+      Point3 p_i;
+      Point3 newP = ray.origin + ray.direction * 0.01f;
+      while (light_color.max() > 0.003f)
+      {
+
+        Ray newRay = Ray(newP, ray.direction, ray.depth);
+        Real ri = ptrScene->rayIntersection(newRay, obj_i, p_i);
+        if (ri >= 0.0f) // intersection avec un objet et la direction
+        {
+          break;
+        }
+        Material m = obj_i->getMaterial(p_i);
+        light_color = light_color * m.diffuse * m.coef_refraction;
+        newP = p_i;
+      }
+      return light_color;
     }
   };
 
