@@ -1137,7 +1137,8 @@ ray-tracer.o: ray-tracer.cpp /usr/local/lib/QtWidgets.framework/Headers/qapplica
 		/usr/local/lib/QtCore.framework/Headers/QEvent \
 		/usr/local/lib/QtCore.framework/Headers/qcoreevent.h \
 		/usr/local/lib/QtCore.framework/Headers/QDateTime \
-		/usr/local/lib/QtCore.framework/Headers/qdatetime.h
+		/usr/local/lib/QtCore.framework/Headers/qdatetime.h \
+		PeriodicPlane.hpp
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o ray-tracer.o ray-tracer.cpp
 
 Sphere.o: Sphere.cpp Sphere.h \
