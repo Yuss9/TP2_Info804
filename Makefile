@@ -351,7 +351,8 @@ DIST          = /usr/local/share/qt/mkspecs/features/spec_pre.prf \
 		Image2D.h \
 		Image2DWriter.h \
 		Renderer.h \
-		Ray.h Viewer.cpp \
+		Ray.h \
+		PeriodicPlane.hpp Viewer.cpp \
 		ray-tracer.cpp \
 		Sphere.cpp
 QMAKE_TARGET  = ray-tracer
@@ -989,7 +990,7 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/local/share/qt/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents Viewer.h PointVector.h Color.h Sphere.h GraphicalObject.h Light.h Material.h PointLight.h Image2D.h Image2DWriter.h Renderer.h Ray.h $(DISTDIR)/
+	$(COPY_FILE) --parents Viewer.h PointVector.h Color.h Sphere.h GraphicalObject.h Light.h Material.h PointLight.h Image2D.h Image2DWriter.h Renderer.h Ray.h PeriodicPlane.hpp $(DISTDIR)/
 	$(COPY_FILE) --parents Viewer.cpp ray-tracer.cpp Sphere.cpp $(DISTDIR)/
 
 

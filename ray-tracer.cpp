@@ -8,6 +8,7 @@
 #include "Sphere.h"
 #include "Material.h"
 #include "PointLight.h"
+#include "PeriodicPlane.hpp"
 
 using namespace std;
 using namespace rt;
@@ -30,10 +31,10 @@ void addBubble(Scene &scene, Point3 c, Real r, Material transp_m)
   scene.addObject(sphere_in);
 }
 
-int main(int argc, char **argv)
+void oldScene()
 {
   // Read command lines arguments.
-  QApplication application(argc, argv);
+  //QApplication application(argc, argv);
 
   // Creates a 3D scene
   Scene scene;
@@ -71,6 +72,47 @@ int main(int argc, char **argv)
   addEmeraldInGlassBubble(scene, Point3(20, 15, 20), 2.0, 1.5);
   addEmeraldInGlassBubble(scene, Point3(20, 5, 20), 2.0, 1.5);
 
+  // Instantiate the viewer.
+  Viewer viewer;
+  // Give a name
+  viewer.setWindowTitle("Ray-tracer preview");
+
+  // Sets the scene
+  viewer.setScene(scene);
+
+  // Make the viewer window visible on screen.
+  viewer.show();
+  // Run main loop.
+  //application.exec();
+}
+
+int main(int argc, char **argv)
+{
+  // Read command lines arguments.
+  QApplication application(argc, argv);
+
+  // Creates a 3D scene
+  Scene scene;
+  Light *light0 = new PointLight(GL_LIGHT0, Point4(0, 0, 1, 0),
+                                 Color(1.0, 1.0, 1.0));
+  Light *light1 = new PointLight(GL_LIGHT1, Point4(-10, -4, 2, 1),
+                                 Color(1.0, 1.0, 1.0));
+  scene.addLight(light0);
+  scene.addLight(light1);
+
+  Sphere *sphere1 = new Sphere(Point3(0, 0, 5), 2.0, Material::bronze());
+  Sphere *sphere2 = new Sphere(Point3(0, 4, 5), 1.0, Material::emerald());
+  Sphere *sphere3 = new Sphere(Point3(6, 6, 5), 3.0, Material::whitePlastic());
+  scene.addObject(sphere1);
+  scene.addObject(sphere2);
+  scene.addObject(sphere3);
+  addBubble(scene, Point3(-5, 4, 6), 2.0, Material::glass());
+
+  // Un sol noir et blanc
+  PeriodicPlane *pplane = new PeriodicPlane(Point3(0, 0, 0), Vector3(5, 0, 0), Vector3(0, 5, 0),
+                                            Material::whitePlastic(), Material::redPlastic(), 0.05f);
+
+  scene.addObject(pplane);
   // Instantiate the viewer.
   Viewer viewer;
   // Give a name
