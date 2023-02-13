@@ -5,10 +5,14 @@
 Sujet : https://www.lama.univ-savoie.fr/pagesmembres/lachaud/Cours/INFO805/Tests/html/ig_tp2.html
 
 ## Screenshots
-
+3.3
 ![App Screenshot](imagesREADME/3.3.png) 
+3.6
 ![App Screenshot](imagesREADME/3.6.png)
+4.2
 ![App Screenshot](imagesREADME/4.2.png)
+4.3
+![App Screenshot](imagesREADME/4.3.png)
 
 ## Authors
 
