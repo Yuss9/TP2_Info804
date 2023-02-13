@@ -6,13 +6,35 @@ Sujet : https://www.lama.univ-savoie.fr/pagesmembres/lachaud/Cours/INFO805/Tests
 
 ## Screenshots
 3.3
+
 ![App Screenshot](imagesREADME/3.3.png) 
+
 3.6
+
 ![App Screenshot](imagesREADME/3.6.png)
+
 4.2
+
 ![App Screenshot](imagesREADME/4.2.png)
+
 4.3
+
 ![App Screenshot](imagesREADME/4.3.png)
+
+Try Emerald in Glass : 
+
+![App Screenshot](imagesREADME/emeralInGlass.png)
+
+
+Vision Infinie : 
+
+![App Screenshot](imagesREADME/visionInfinie.png)
+
+
+Perfect Try with Wall and PeriodicPlane : 
+
+![App Screenshot](imagesREADME/perfectTryWall.png)
+
 
 ## Authors
 
