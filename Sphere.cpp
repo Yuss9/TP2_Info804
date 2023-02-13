@@ -87,11 +87,6 @@ rt::Sphere::getMaterial(Point3 /* p */)
   return material; // the material is constant along the sphere.
 }
 
-/*
-
-Il calcule la distance entre le point d'origine du rayon et le cercle, puis utilise le théorème de Pythagore pour déterminer si le rayon intersecte ou non le cercle. Si le rayon intersecte le cercle, le code calcule les points d'intersection et renvoie -1.0f pour indiquer que l'intersection a eu lieu. Sinon, il renvoie 1.0f pour indiquer qu'il n'y a pas d'intersection.
-
-*/
 rt::Real
 rt::Sphere::rayIntersection(const Ray &ray, Point3 &p)
 {
@@ -134,4 +129,4 @@ rt::Sphere::rayIntersection(const Ray &ray, Point3 &p)
       return -1.0f;
     }
   }
-}
+};

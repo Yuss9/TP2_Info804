@@ -9,6 +9,7 @@
 #include "Color.h"
 #include "Image2D.h"
 #include "Ray.h"
+
 /// Namespace RayTracer
 namespace rt
 {
@@ -106,9 +107,9 @@ namespace rt
     /// corner pixel of the viewport, i.e. pixel (width,height)
     Vector3 myDirLR;
     Background *ptrBackground;
-
     int myWidth;
     int myHeight;
+
     Renderer() : ptrScene(0) {}
     Renderer(Scene &scene) : ptrScene(&scene)
     {
@@ -162,35 +163,42 @@ namespace rt
     Color trace(const Ray &ray)
     {
       assert(ptrScene != 0);
-      Color result = Color(0.0, 0.0, 0.0);
+      // Color result = Color( 0.0, 0.0, 0.0 );
       GraphicalObject *obj_i = 0; // pointer to intersected object
       Point3 p_i;                 // point of intersection
+
+      // Look for intersection in this direction.
       Real ri = ptrScene->rayIntersection(ray, obj_i, p_i);
       // Nothing was intersected
       if (ri >= 0.0f)
-        return this->background(ray); // some background color
-      // Color C = obj_i->getMaterial(p_i).ambient + obj_i->getMaterial(p_i).diffuse;
-      // return Color(C.r(), C.g(), C.b());
-      // return illumination(ray, obj_i, p_i);
+        return background(ray); // some background color
       Material m = obj_i->getMaterial(p_i);
-      if (ray.depth > 0 && m.coef_reflexion != 0)
+
+      Color result = Color(0.0, 0.0, 0.0);
+
+      if (ray.depth > 0 && m.coef_reflexion > 0)
       {
-        Vector3 reflected_vector = reflect(ray.direction, obj_i->getNormal(p_i));
-        Ray newRay = Ray(p_i + reflected_vector * 0.001f, reflected_vector, ray.depth - 1);
+        Vector3 ReflectionRayon = reflect(ray.direction, obj_i->getNormal(p_i));
+        Ray newRay = Ray(p_i + ReflectionRayon * 0.001f, ReflectionRayon, ray.depth - 1);
         Color c_refl = trace(newRay);
         result += c_refl * m.specular * m.coef_reflexion;
       }
+
       if (ray.depth > 0 && m.coef_refraction > 0)
       {
-        Ray refractedRay = refractionRay(ray, p_i, obj_i->getNormal(p_i), m);
-        Color c_refr = trace(refractedRay);
+        Ray newRay = refractionRay(ray, p_i, obj_i->getNormal(p_i), m);
+        Color c_refr = trace(newRay);
         result += c_refr * m.diffuse * m.coef_refraction;
       }
+
       if (ray.depth > 0)
       {
         result += illumination(ray, obj_i, p_i) * m.coef_diffusion;
       }
-      result += illumination(ray, obj_i, p_i);
+      else
+      {
+        result += illumination(ray, obj_i, p_i);
+      }
       return result;
     }
 
@@ -208,15 +216,26 @@ namespace rt
       return W - 2 * W.dot(N) * N;
     }
 
+    /// Calcule l'illumination de l'objet obj au point p, sachant que l'observateur est le rayon ray.
     Color illumination(const Ray &ray, GraphicalObject *obj, Point3 p)
     {
+      // recup materiau de obj
       Material m = obj->getMaterial(p);
-
       Color C;
 
       for (std::vector<Light *>::const_iterator it = this->ptrScene->myLights.begin(), itE = this->ptrScene->myLights.end(); it != itE; it++)
       {
         Vector3 L = (*it)->direction(p);
+
+        // // Kd coefficient de diffusion
+        // // Le produit scalaire est un nombre qui mesure l 'angle entre deux vecteurs, et donc la quantité de lumière qui est réfléchie par l' objet en position 'p' dans la direction de la lumière 'L'.Le résultat final de la division est normalisé pour éviter les fluctuations dans l 'intensité de la lumière en fonction de la distance entre l' objet et la source de lumière.
+        // // .norm()) = longueur vecteur
+        // Real kd = obj->getNormal(p).dot(L) / (L.norm() * obj->getNormal(p).norm());
+        // if (kd < 0.0)
+        //   kd = 0.0;
+        // Color B = (*it)->color(p);
+        // Color D = m.diffuse;
+        // C += kd * D * B;
 
         Real kd = obj->getNormal(p).dot(L) / (L.norm() * obj->getNormal(p).norm());
         Vector3 w = reflect(ray.direction, obj->getNormal(p));
@@ -224,7 +243,7 @@ namespace rt
 
         Color colorLight = (*it)->color(p);
         Ray pointLight = Ray(p, L);
-        Color shado = shadow(pointLight, colorLight);
+        Color shadowColor = this->shadow(pointLight, colorLight);
 
         if (cosB < 0.0)
           cosB = 0.0;
@@ -237,7 +256,7 @@ namespace rt
         Color B = (*it)->color(p);
         Color D = m.diffuse;
         C += kd * m.specular * coefficientSpecularite;
-        C +=  D * kd * shado;
+        C += B * D * kd * shadowColor;
       }
       C += m.ambient;
       return C;
@@ -270,10 +289,10 @@ namespace rt
     {
       GraphicalObject *obj_i = 0;
       Point3 p_i;
-      Point3 newP = ray.origin + ray.direction * 0.01f;
+      Point3 newP = ray.origin;
       while (light_color.max() > 0.003f)
       {
-
+        newP = newP + ray.direction * 0.01f; // on decale le point p;
         Ray newRay = Ray(newP, ray.direction, ray.depth);
         Real ri = ptrScene->rayIntersection(newRay, obj_i, p_i);
         if (ri >= 0.0f) // intersection avec un objet et la direction
@@ -289,25 +308,53 @@ namespace rt
 
     Ray refractionRay(const Ray &aRay, const Point3 &p, Vector3 N, const Material &m)
     {
-      Point3 newPoint = aRay.origin + aRay.direction * 0.001f;
-      Real r;
-      if (aRay.direction.dot(N) > 0)
+      Real paranthese;
+      Vector3 V = aRay.direction;
+      // ratio
+      Real r = m.in_refractive_index / m.out_refractive_index;
+
+      /**
+       c est le produit scalaire entre la normale N et la direction du rayon d'entrée V. Il représente l'angle entre le vecteur N et V. Cette valeur est négative si V est à l'extérieur de l'objet et positive si V est à l'intérieur de l'objet.
+       */
+      Real c = (-1.0f) * N.dot(V);
+
+      // si le rayon est a l'interieur et sort de l'objet
+      if (V.dot(N) <= 0)
       {
-        r = m.in_refractive_index / m.out_refractive_index;
+        r = 1.0f / r; // on inverse le ratio
       }
+
+      Vector3 VR;
+      if (c > 0)
+        VR = Vector3(r * V + (r * c - sqrt(1 - ((r * r) * (1 - (c * c))))) * N);
       else
       {
-        r = m.out_refractive_index / m.in_refractive_index;
-        N[0] = N[0] * -1;
-        N[1] = N[1] * -1;
-        N[2] = N[2] * -1;
+        VR = Vector3(r * V + (r * c + sqrt(1 - ((r * r) * (1 - (c * c))))) * N);
       }
-      Real c = -N.dot(aRay.direction);
-      Real calcul = 1 - r * r * (1 - c * c);
-      Vector3 refractedVector = r * aRay.direction + (r * c - std::sqrt(std::max(0.0f, calcul))) * N;
-      return Ray(newPoint, refractedVector.dot(refractedVector), aRay.depth - 1);
+
+      /*
+        Cette condition vérifie si le rayon réfracté peut exister. Si la valeur de 1 - ((r * r) * (1 - (c * c))) est inférieure à zéro, cela signifie que la réfraction n'a pas lieu et que le rayon est réfléchi à la surface de l'objet. Dans ce cas, la direction du rayon réfracté vRefrac est remplacée par la direction du rayon réfléchi en utilisant la fonction reflect(aRay.direction, N).
+      */
+
+      if (1 - ((r * r) * (1 - (c * c))) < 0)
+      {
+        VR = reflect(V, N);
+      }
+
+      /*
+      Cette ligne de code crée un nouveau rayon, appelé newRay, à partir des informations données.
+      Le point de départ du nouveau rayon est défini par p + VR * 0.01f, où p est le point d'intersection du rayon d'entrée avec la surface de l'objet, VR est la direction du rayon réfracté et 0.01f est un petit décalage pour éviter que le point de départ du rayon soit exactement sur la surface de l'objet. Ce décalage permet de garantir que le rayon ne traverse pas la surface de l'objet deux fois.
+      La direction du nouveau rayon est donnée par VR, qui est la direction du rayon réfracté.
+      La profondeur restante du nouveau rayon est définie par aRay.depth - 1, où aRay.depth est la profondeur actuelle du rayon d'entrée et -1 signifie que la profondeur est réduite d'une unité pour refléter le fait que le rayon a traversé une surface supplémentaire.
+      Enfin, le nouveau rayon newRay est retourné pour être utilisé dans les calculs ultérieurs.
+*/
+
+      Ray newRay = Ray(p + VR * 0.01f, VR, aRay.depth - 1);
+
+      return newRay;
     }
   };
+
 } // namespace rt
 
 #endif // #define _RENDERER_H_
