@@ -64,6 +64,12 @@ int main(int argc, char **argv)
   addBubble(scene, Point3(-5, 9, -3), 2.0, Material::glass());
 
   addEmeraldInGlassBubble(scene, Point3(20, 20, 20), 2.0, 1.5);
+  addEmeraldInGlassBubble(scene, Point3(10, 2, 20), 2.0, 1.5);
+  addEmeraldInGlassBubble(scene, Point3(20, 10, 20), 2.0, 1.5);
+  addEmeraldInGlassBubble(scene, Point3(15, 20, 10), 2.0, 1.5);
+  addEmeraldInGlassBubble(scene, Point3(20, 20, 6), 2.0, 1.5);
+  addEmeraldInGlassBubble(scene, Point3(20, 15, 20), 2.0, 1.5);
+  addEmeraldInGlassBubble(scene, Point3(20, 5, 20), 2.0, 1.5);
 
   // Instantiate the viewer.
   Viewer viewer;
