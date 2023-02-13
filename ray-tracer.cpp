@@ -108,16 +108,16 @@ int main(int argc, char **argv)
   scene.addObject(sphere3);
   addBubble(scene, Point3(-5, 4, 6), 2.0, Material::glass());
 
-  // // Un sol noir et blanc
-  // PeriodicPlane *pplane = new PeriodicPlane(Point3(0, 0, 0), Vector3(5, 0, 0), Vector3(0, 5, 0),
-  //                                           Material::whitePlastic(), Material::redPlastic(), 0.05f);
+  // Un sol noir et blanc
+  PeriodicPlane *pplane = new PeriodicPlane(Point3(0, 0, 0), Vector3(5, 0, 0), Vector3(0, 5, 0),
+                                            Material::whitePlastic(), Material::redPlastic(), 0.05f);
 
-  // // Un mur de building "moderne" à gauche.
-  // PeriodicPlane *plane = new PeriodicPlane(Point3(-10, 0, 0), Vector3(0, 2, 0), Vector3(0, 0, 4),
-  //                                           Material::mirror(), Material::blackMatter(), 0.025f);
+  // Un mur de building "moderne" à gauche.
+  PeriodicPlane *plane = new PeriodicPlane(Point3(-10, 0, 0), Vector3(0, 2, 0), Vector3(0, 0, 4),
+                                            Material::mirror(), Material::blackMatter(), 0.025f);
 
-  //scene.addObject(pplane);
-  //scene.addObject(plane);
+  scene.addObject(pplane);
+  scene.addObject(plane);
 
   // Instantiate the viewer.
   Viewer viewer;
