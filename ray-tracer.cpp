@@ -12,6 +12,14 @@
 using namespace std;
 using namespace rt;
 
+void addEmeraldInGlassBubble(Scene &scene, Point3 c, Real r_outer, Real r_inner)
+{
+  Sphere *sphere_outer = new Sphere(c, 2.0, Material::glass());
+  Sphere *sphere_inner = new Sphere(c, 1.0, Material::emerald());
+  scene.addObject(sphere_outer);
+  scene.addObject(sphere_inner);
+}
+
 void addBubble(Scene &scene, Point3 c, Real r, Material transp_m)
 {
   Material revert_m = transp_m;
@@ -36,14 +44,26 @@ int main(int argc, char **argv)
   scene.addLight(light0);
   scene.addLight(light1);
   // Objects
-  Sphere *sphere1 = new Sphere(Point3(0, 0, 0), 2.0, Material::bronze());
+  Sphere *bronze1 = new Sphere(Point3(0, 0, 0), 2.0, Material::bronze());
+  Sphere *bronze2 = new Sphere(Point3(1, 0, 0), 2.0, Material::bronze());
+  Sphere *bronze3 = new Sphere(Point3(0, 1, 1), 2.0, Material::bronze());
+
   Sphere *sphere2 = new Sphere(Point3(0, 4, 0), 1.0, Material::emerald());
   Sphere *sphere3 = new Sphere(Point3(6, 6, 0), 3.0, Material::whitePlastic());
-  scene.addObject(sphere1);
+
+  scene.addObject(bronze1);
+  scene.addObject(bronze2);
+  scene.addObject(bronze3);
+
   scene.addObject(sphere2);
   scene.addObject(sphere3);
 
-  addBubble(scene, Point3(-5, 4, -1), 2.0, Material::glass());
+  addBubble(scene, Point3(-5, 10, -1), 2.0, Material::glass());
+  addBubble(scene, Point3(-3, 6, -1), 2.0, Material::glass());
+  addBubble(scene, Point3(-1, 8, -5), 2.0, Material::glass());
+  addBubble(scene, Point3(-5, 9, -3), 2.0, Material::glass());
+
+  addEmeraldInGlassBubble(scene, Point3(20, 20, 20), 2.0, 1.5);
 
   // Instantiate the viewer.
   Viewer viewer;
