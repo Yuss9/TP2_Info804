@@ -54,5 +54,4 @@ Perfect Try with Wall and PeriodicPlane :
   ./executables/viewerQ2 bunny258.tri bunnyCompressed.tri 20 20 20
 ``` -->
 
-Toutes les questions seront été abordées.
-
+Nous sommes actuellement à la question 5.2
