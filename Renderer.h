@@ -361,26 +361,38 @@ namespace rt
       image = Image2D<Color>(myWidth, myHeight);
 
       // on fait la moyenne des couleurs
-      for (int i = 0; i < myWidth; i++)
+      for (int i = 0; i < myHeight; i++)
       {
-        for (int j = 0; j < myHeight; j++)
+        for (int j = 0; j < myWidth; j++)
         {
           Color color = Color(0.0f, 0.0f, 0.0f);
           for (int k = 0; k < numberRay; k++)
           {
-            // on tire un point aleatoire dans le pixel
-            Real x = i + (rand() % 100) / 100.0f;
-            Real y = j + (rand() % 100) / 100.0f;
-            Ray ray = myCamera->getRay(x, y);
-            color += render(ray, max_depth);
+            Real progressNumber = (Real)i / (Real)(myHeight - 1);
+
+            // random number between 0 and 1
+            float randomy = ((1.0 - 0.0) * ((float)rand() / RAND_MAX)) + 0.0;
+            float randomx = ((1.0 - 0.0) * ((float)rand() / RAND_MAX)) + 0.0;
+
+            // random X and Y check render function
+            Real ty = ((Real)i + randomy) / (Real)(myHeight - 1);
+            Real tx = ((Real)j + randomx) / (Real)(myWidth - 1);
+
+            progressBar(std::cout, progressNumber, 1.0);
+            Vector3 dirL = (1.0f - ty) * myDirUL + ty * myDirLL;
+            Vector3 dirR = (1.0f - ty) * myDirUR + ty * myDirLR;
+            dirL /= dirL.norm();
+            dirR /= dirR.norm();
+
+            Vector3 dir = ((1.0f - tx) * dirL) + (tx * dirR);
+            Ray eye_ray = Ray(myOrigin, dir, max_depth);
+            color = color + trace(eye_ray);
           }
           color = color / numberRay;
-          image(i, j) = color;
+          image.at(j, i) = color.clamp(); // j i car on a inversé les coordonnées, on parcours la hauteur d'abord
         }
       }
-
-      
-
+      std::cout << "Anti aliascing DONE" << std::endl;
     }
   };
 

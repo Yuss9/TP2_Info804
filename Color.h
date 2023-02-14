@@ -73,6 +73,16 @@ namespace rt {
       return tmp;
     }
 
+    // operator / with int
+    Color operator/( int v ) const
+    {
+      Color tmp( *this );
+      tmp.my_channels[ 0 ] /= v;
+      tmp.my_channels[ 1 ] /= v;
+      tmp.my_channels[ 2 ] /= v;
+      return tmp;
+    }
+
     // Operations between colors
     Color& operator+=( Color other )
     {

@@ -31,5 +31,5 @@ Premier lancement
     ./ray-tracer.app/Contents/MacOS/ray-tracer
 ```
 
-Nous sommes à la question 4.3
+Nous sommes à la question 5.4 (Anti-aliasing fonctionne) mais je n'ai pas réussi la question 5.2
 

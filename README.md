@@ -36,6 +36,15 @@ Perfect Try with Wall and PeriodicPlane :
 ![App Screenshot](imagesREADME/perfectTryWall.png)
 
 
+Without Anti-aliasing : 
+
+![App Screenshot](imagesREADME/withoutAntiAliascing.png)
+
+With Anti-aliasing :
+
+![App Screenshot](imagesREADME/withAntiAliascing.png)
+
+
 ## Authors
 
 - [@YURTSEVEN Huseyin](https://github.com/Yuss9)
@@ -54,4 +63,4 @@ Perfect Try with Wall and PeriodicPlane :
   ./executables/viewerQ2 bunny258.tri bunnyCompressed.tri 20 20 20
 ``` -->
 
-Nous sommes actuellement à la question 5.2
+Nous sommes à la question 5.4 (Anti-aliasing fonctionne) mais je n'ai pas réussi la question 5.2
