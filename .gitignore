@@ -33,6 +33,8 @@ Makefile*
 *.qm
 *.prl
 
+.vscode
+
 # Qt unit tests
 target_wrapper.*
 
