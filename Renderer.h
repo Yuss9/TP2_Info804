@@ -353,6 +353,35 @@ namespace rt
 
       return newRay;
     }
+
+    void randomRender(Image2D<Color> &image, int max_depth)
+    {
+      // doit etre entre 10 et 20
+      int numberRay = 15;
+      image = Image2D<Color>(myWidth, myHeight);
+
+      // on fait la moyenne des couleurs
+      for (int i = 0; i < myWidth; i++)
+      {
+        for (int j = 0; j < myHeight; j++)
+        {
+          Color color = Color(0.0f, 0.0f, 0.0f);
+          for (int k = 0; k < numberRay; k++)
+          {
+            // on tire un point aleatoire dans le pixel
+            Real x = i + (rand() % 100) / 100.0f;
+            Real y = j + (rand() % 100) / 100.0f;
+            Ray ray = myCamera->getRay(x, y);
+            color += render(ray, max_depth);
+          }
+          color = color / numberRay;
+          image(i, j) = color;
+        }
+      }
+
+      
+
+    }
   };
 
 } // namespace rt

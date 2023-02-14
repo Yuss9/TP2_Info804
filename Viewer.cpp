@@ -53,7 +53,7 @@ void rt::Viewer::keyPressEvent(QKeyEvent *e)
   // Get event modifiers key
   const Qt::KeyboardModifiers modifiers = e->modifiers();
   bool handled = false;
-  if ((e->key() == Qt::Key_R) && ptrScene != 0)
+  if (((e->key() == Qt::Key_R) || (e->key() == Qt::Key_A)) && ptrScene != 0)
   {
     int w = camera()->screenWidth();
     int h = camera()->screenHeight();
@@ -81,7 +81,14 @@ void rt::Viewer::keyPressEvent(QKeyEvent *e)
     }
     Image2D<Color> image(w, h);
     renderer.setResolution(image.w(), image.h());
-    renderer.render(image, maxDepth);
+    if (e->key() == Qt::Key_A)
+    {
+      renderer.randomRender(image, maxDepth);
+    }
+    else
+    {
+      renderer.render(image, maxDepth);
+    }
     ofstream output("output.ppm");
     Image2DWriter<Color>::write(image, output, true);
     output.close();
