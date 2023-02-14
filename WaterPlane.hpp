@@ -12,8 +12,8 @@ namespace rt
 
         void coordinates(Point3 p, Real &x, Real &y)
         {
-            x = u[0] + p[0];
-            y = u[1] + p[1];
+            x = u[0] + v[0] + p[0];
+            y = u[1] + v[1] + p[1];
         }
 
         void init(Viewer & /* viewer */) {}
