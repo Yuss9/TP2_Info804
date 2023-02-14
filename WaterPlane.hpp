@@ -4,19 +4,16 @@
 namespace rt
 {
 
-    struct PeriodicPlane : public GraphicalObject
+    struct WaterPlane : public GraphicalObject
     {
-        /// Creates a periodic infinite plane passing through \a c and
-        /// tangent to \a u and \a v. Then \a w defines the width of the
-        /// band around (0,0) and its period to put material \a band_m,
-        /// otherwise \a main_m is used.
-        PeriodicPlane(Point3 c, Vector3 u, Vector3 v,
-                      Material main_m, Material band_m, Real w) : c{c}, u{u}, v{v}, main_m{main_m}, band_m{band_m}, w{w} {};
+    
+        WaterPlane(Point3 c, Vector3 u, Vector3 v,
+                   Material main_m, Material band_m, Real w) : c{c}, u{u}, v{v}, main_m{main_m}, band_m{band_m}, w{w} {};
 
         void coordinates(Point3 p, Real &x, Real &y)
         {
-            x = u[0] + v[0] + p[0];
-            y = u[1] + v[1] + p[1];
+            x = u[0] + p[0];
+            y = u[1] + p[1];
         }
 
         void init(Viewer & /* viewer */) {}

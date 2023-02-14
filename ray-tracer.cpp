@@ -96,28 +96,27 @@ int main(int argc, char **argv)
   Light *light0 = new PointLight(GL_LIGHT0, Point4(0, 0, 1, 0),
                                  Color(1.0, 1.0, 1.0));
   Light *light1 = new PointLight(GL_LIGHT1, Point4(-10, -4, 2, 1),
-                                 Color(1.0, 1.0, 1.0));
+                                 Color(1.0, 0.8, 0.8));
   scene.addLight(light0);
-  scene.addLight(light1);
+  // scene.addLight(light1);
 
-  Sphere *sphere1 = new Sphere(Point3(0, 0, 5), 2.0, Material::bronze());
-  Sphere *sphere2 = new Sphere(Point3(0, 4, 5), 1.0, Material::emerald());
-  Sphere *sphere3 = new Sphere(Point3(6, 6, 5), 3.0, Material::whitePlastic());
+  Sphere *sphere1 = new Sphere(Point3(0, 0, 2), 2.0, Material::bronze());
+  Sphere *sphere2 = new Sphere(Point3(0, 4, 1), 1.0, Material::emerald());
+  Sphere *sphere3 = new Sphere(Point3(6, 6, 3), 3.0, Material::whitePlastic());
   scene.addObject(sphere1);
   scene.addObject(sphere2);
   scene.addObject(sphere3);
-  addBubble(scene, Point3(-5, 4, 6), 2.0, Material::glass());
+  addBubble(scene, Point3(-5, 4, 2), 2.0, Material::glass());
 
   // Un sol noir et blanc
   PeriodicPlane *pplane = new PeriodicPlane(Point3(0, 0, 0), Vector3(5, 0, 0), Vector3(0, 5, 0),
-                                            Material::whitePlastic(), Material::redPlastic(), 0.05f);
+                                            Material::whitePlastic(), Material::blackMatter(), 0.1f);
 
   // Un mur de building "moderne" à gauche.
-  PeriodicPlane *plane = new PeriodicPlane(Point3(-10, 0, 0), Vector3(0, 2, 0), Vector3(0, 0, 4),
-                                            Material::mirror(), Material::blackMatter(), 0.025f);
+  // PeriodicPlane *plane = new PeriodicPlane(Point3(-10, 0, 0), Vector3(0, 2, 0), Vector3(0, 0, 4), Material::mirror(), Material::blackMatter(), 0.025f);
 
   scene.addObject(pplane);
-  scene.addObject(plane);
+  // scene.addObject(plane);
 
   // Instantiate the viewer.
   Viewer viewer;
